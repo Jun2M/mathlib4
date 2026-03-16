@@ -34,17 +34,22 @@ initialize_simps_projections prodDart (+toProd, -fst, -snd)
 
 attribute [simp] prodDart.adj
 
-variable {G : Gr} [HasDart.{0} α Gr]
+variable {G : Gr}
 
-theorem prodDart.ext_iff (d₁ d₂ : prodDart G) : d₁ = d₂ ↔ d₁.toProd = d₂.toProd := by
+theorem prodDart.ext_iff [HasDart.{0} α Gr] (d₁ d₂ : prodDart G) :
+    d₁ = d₂ ↔ d₁.toProd = d₂.toProd := by
   cases d₁; cases d₂; simp +contextual
 
 @[ext]
-theorem prodDart.ext (d₁ d₂ : prodDart G) (h : d₁.toProd = d₂.toProd) : d₁ = d₂ :=
+theorem prodDart.ext [HasDart.{0} α Gr] (d₁ d₂ : prodDart G) (h : d₁.toProd = d₂.toProd) :
+    d₁ = d₂ :=
   (prodDart.ext_iff d₁ d₂).mpr h
 
-theorem prodDart.toProd_injective : Function.Injective (prodDart.toProd : prodDart G → α × α) :=
+theorem prodDart.toProd_injective [HasDart.{0} α Gr] :
+    Function.Injective (prodDart.toProd : prodDart G → α × α) :=
   prodDart.ext
+
+variable [HasDart α Gr]
 
 instance [DecidableEq α] (G : Gr) : DecidableEq (prodDart G) :=
   prodDart.toProd_injective.decidableEq
