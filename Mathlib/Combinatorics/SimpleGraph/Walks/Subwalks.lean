@@ -25,7 +25,7 @@ walks, subwalks
 
 @[expose] public section
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 
 variable {V : Type*} {G G' : SimpleGraph V} {u v u' v' : V}
 
@@ -142,19 +142,19 @@ theorem isSubwalk_nil_iff_mem_support (p : Walk G u v) :
   isSubwalk_iff_support_isInfix.trans <| p.support.singleton_infix_iff _
 
 theorem isSubwalk_toWalk_iff_mem_darts (p : Walk G u v) (h : G.Adj u' v') :
-    (Adj.toWalk h).IsSubwalk p ↔ ⟨⟨u', v'⟩, h⟩ ∈ p.darts := by
+    (dart.toWalk h).IsSubwalk p ↔ ⟨⟨u', v'⟩, h⟩ ∈ p.darts := by
   simp [isSubwalk_iff_darts_isInfix, List.singleton_infix_iff]
 
-theorem isSubwalk_toWalk_adj_iff_mem_darts {d : Dart G} (p : Walk G u v) :
+theorem isSubwalk_toWalk_adj_iff_mem_darts {d : prodDart G} (p : Walk G u v) :
     d.adj.toWalk.IsSubwalk p ↔ d ∈ p.darts :=
   isSubwalk_toWalk_iff_mem_darts ..
 
 theorem isSubwalk_toWalk_iff_mem_edges {p : Walk G u v} (h : G.Adj u' v') :
-    (Adj.toWalk h).IsSubwalk p ∨ (Adj.toWalk h.symm).IsSubwalk p ↔ s(u', v') ∈ p.edges := by
+    (dart.toWalk h).IsSubwalk p ∨ (dart.toWalk h.symm).IsSubwalk p ↔ s(u', v') ∈ p.edges := by
   rw [isSubwalk_toWalk_iff_mem_darts, isSubwalk_toWalk_iff_mem_darts, edges, List.mem_map]
-  refine ⟨fun h ↦ by grind [Dart.edge], fun h ↦ ?_⟩
+  refine ⟨fun h ↦ by grind [prodDart.edge], fun h ↦ ?_⟩
   have ⟨d, hd, h⟩ := h
-  rw [Dart.edge, Sym2.eq, Sym2.rel_iff'] at h
+  rw [prodDart.edge, Sym2.eq, Sym2.rel_iff'] at h
   refine h.imp (fun h ↦ ?_) (fun h ↦ ?_)
     <;> convert hd using 2
     <;> exact h.symm
@@ -236,4 +236,4 @@ theorem drop_isSubwalk_drop {u v n k} (p : Walk G u v) (h : n ≤ k) :
     | zero => exact p.drop_zero ▸ (p.isSubwalk_rfl.copy rfl rfl p.getVert_zero.symm rfl).tail
     | succ _ ih => cases p <;> simp [drop, ih]
 
-end HasAdj.Walk
+end HasDart.Walk

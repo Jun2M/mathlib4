@@ -183,7 +183,7 @@ end SimpleGraph
 
 /-! ### Walks as subgraphs -/
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 open SimpleGraph
 
 universe u v
@@ -532,14 +532,14 @@ lemma exists_mem_support_forall_mem_support_imp_eq (s : Finset V)
   rwa [Finset.filter_erase, ← Finset.subset_empty, ← Finset.subset_insert_iff,
     LawfulSingleton.insert_empty_eq] at h
 
-end HasAdj.Walk
+end HasDart.Walk
 
 namespace SimpleGraph.Subgraph
 
 universe u
 variable {V : Type u} {G : SimpleGraph V}
 
-lemma _root_.HasAdj.Walk.toSubgraph_connected {u v : V} (p : HasAdj.Walk G u v) :
+lemma _root_.HasDart.Walk.toSubgraph_connected {u v : V} (p : HasDart.Walk G u v) :
     p.toSubgraph.Connected := by
   induction p with
   | nil => apply singletonSubgraph_connected
@@ -572,7 +572,7 @@ lemma Connected.adj_union {H K : G.Subgraph}
 set_option backward.isDefEq.respectTransparency false in
 lemma preconnected_iff_forall_exists_walk_subgraph (H : G.Subgraph) :
     H.Preconnected ↔ ∀ {u v}, u ∈ H.verts → v ∈ H.verts →
-      ∃ p : HasAdj.Walk G u v, p.toSubgraph ≤ H := by
+      ∃ p : HasDart.Walk G u v, p.toSubgraph ≤ H := by
   constructor
   · intro hc u v hu hv
     refine (hc ⟨_, hu⟩ ⟨_, hv⟩).elim fun p => ?_
@@ -588,7 +588,7 @@ lemma preconnected_iff_forall_exists_walk_subgraph (H : G.Subgraph) :
 lemma connected_iff_forall_exists_walk_subgraph (H : G.Subgraph) :
     H.Connected ↔
       H.verts.Nonempty ∧
-        ∀ {u v}, u ∈ H.verts → v ∈ H.verts → ∃ p : HasAdj.Walk G u v, p.toSubgraph ≤ H := by
+        ∀ {u v}, u ∈ H.verts → v ∈ H.verts → ∃ p : HasDart.Walk G u v, p.toSubgraph ≤ H := by
   rw [H.connected_iff, preconnected_iff_forall_exists_walk_subgraph, and_comm]
 
 end Subgraph
@@ -626,7 +626,7 @@ lemma Subgraph.Connected.induce_verts {H : G.Subgraph} (h : H.Connected) :
   rw [connected_induce_iff]
   exact h.mono le_induce_top_verts (by exact rfl)
 
-lemma _root_.HasAdj.Walk.connected_induce_support {u v : V} (p : HasAdj.Walk G u v) :
+lemma _root_.HasDart.Walk.connected_induce_support {u v : V} (p : HasDart.Walk G u v) :
     (G.induce {v | v ∈ p.support}).Connected := by
   rw [← p.verts_toSubgraph]
   exact p.toSubgraph_connected.induce_verts
@@ -683,10 +683,10 @@ lemma extend_finset_to_connected (Gpc : G.Preconnected) {t : Finset V} (tn : t.N
   obtain ⟨u, ut⟩ := tn
   refine ⟨t.biUnion (fun v => (Gpc u v).some.support.toFinset), fun v vt => ?_, ?_⟩
   · simp only [Finset.mem_biUnion, List.mem_toFinset]
-    exact ⟨v, vt, HasAdj.Walk.end_mem_support _⟩
+    exact ⟨v, vt, HasDart.Walk.end_mem_support _⟩
   · apply G.induce_connected_of_patches u
     · simp only [Finset.coe_biUnion, Finset.mem_coe, List.coe_toFinset, Set.mem_iUnion,
-                 Set.mem_setOf_eq, HasAdj.Walk.start_mem_support, exists_prop, and_true]
+                 Set.mem_setOf_eq, HasDart.Walk.start_mem_support, exists_prop, and_true]
       exact ⟨u, ut⟩
     intro v hv
     simp only [Finset.mem_coe, Finset.mem_biUnion, List.mem_toFinset] at hv
@@ -694,8 +694,8 @@ lemma extend_finset_to_connected (Gpc : G.Preconnected) {t : Finset V} (tn : t.N
     refine ⟨{x | x ∈ (Gpc u w).some.support}, ?_, ?_⟩
     · simp only [Finset.coe_biUnion, Finset.mem_coe, List.coe_toFinset]
       exact fun x xw => Set.mem_iUnion₂.mpr ⟨w, wt, xw⟩
-    · simp only [Set.mem_setOf_eq, HasAdj.Walk.start_mem_support, exists_true_left]
-      refine ⟨hw, HasAdj.Walk.connected_induce_support _ _ _⟩
+    · simp only [Set.mem_setOf_eq, HasDart.Walk.start_mem_support, exists_true_left]
+      refine ⟨hw, HasDart.Walk.connected_induce_support _ _ _⟩
 
 end induced_subgraphs
 

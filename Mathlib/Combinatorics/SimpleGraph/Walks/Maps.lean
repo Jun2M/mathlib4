@@ -31,7 +31,7 @@ walks
 
 @[expose] public section
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 open SimpleGraph
 
 universe u v w
@@ -251,4 +251,4 @@ theorem map_toDeleteEdges_eq (s : Set (Sym2 V)) {p : Walk G v w} (hp) :
   rw [← transfer_eq_map_ofLE, transfer_transfer, transfer_self]
   apply edges_transfer _ _ ▸ p.edges_subset_edgeSet
 
-end HasAdj.Walk
+end HasDart.Walk

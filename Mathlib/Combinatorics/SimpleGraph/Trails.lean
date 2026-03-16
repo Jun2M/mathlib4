@@ -17,18 +17,18 @@ as Eulerian circuits).
 
 ## Main definitions
 
-* `HasAdj.Walk.IsEulerian` is the predicate that a trail is an Eulerian trail.
-* `HasAdj.Walk.IsTrail.even_countP_edges_iff` gives a condition on the number of edges
+* `HasDart.Walk.IsEulerian` is the predicate that a trail is an Eulerian trail.
+* `HasDart.Walk.IsTrail.even_countP_edges_iff` gives a condition on the number of edges
   in a trail that can be incident to a given vertex.
-* `HasAdj.Walk.IsEulerian.even_degree_iff` gives a condition on the degrees of vertices
+* `HasDart.Walk.IsEulerian.even_degree_iff` gives a condition on the degrees of vertices
   when there exists an Eulerian trail.
-* `HasAdj.Walk.IsEulerian.card_odd_degree` gives the possible numbers of odd-degree
+* `HasDart.Walk.IsEulerian.card_odd_degree` gives the possible numbers of odd-degree
   vertices when there exists an Eulerian trail.
 
 ## TODO
 
 * Prove that there exists an Eulerian trail when the conclusion to
-  `HasAdj.Walk.IsEulerian.card_odd_degree` holds.
+  `HasDart.Walk.IsEulerian.card_odd_degree` holds.
 
 ## Tags
 
@@ -38,7 +38,7 @@ Eulerian trails
 
 @[expose] public section
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 
 variable {V : Type*} {G : SimpleGraph V}
 
@@ -153,4 +153,4 @@ theorem IsEulerian.card_odd_degree [Fintype V] [DecidableRel G.Adj] {u v : V} {p
   apply IsEulerian.card_filter_odd_degree ht
   simp
 
-end HasAdj.Walk
+end HasDart.Walk

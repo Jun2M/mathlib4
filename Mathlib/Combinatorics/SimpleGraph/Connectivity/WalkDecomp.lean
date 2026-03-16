@@ -18,7 +18,7 @@ public import Mathlib.Combinatorics.SimpleGraph.Walks.Subwalks
 
 @[expose] public section
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 
 universe u
 
@@ -91,7 +91,7 @@ def dropUntil {v w : V} : ∀ (p : Walk G v w) (u : V), u ∈ p.support → Walk
       · assumption
 
 /-- The `takeUntil` and `dropUntil` functions split a walk into two pieces.
-The lemma `HasAdj.Walk.count_support_takeUntil_eq_one` specifies where this split occurs. -/
+The lemma `HasDart.Walk.count_support_takeUntil_eq_one` specifies where this split occurs. -/
 @[simp]
 theorem take_spec {u v w : V} (p : Walk G v w) (h : u ∈ p.support) :
     (p.takeUntil u h).append (p.dropUntil u h) = p := by
@@ -336,4 +336,4 @@ theorem mem_support_iff_exists_getVert {u v w : V} {p : Walk G v w} :
     (fun h ↦ ⟨_, p.getVert_length_takeUntil h, p.length_takeUntil_le h⟩)
     (fun ⟨_, h, _⟩ ↦ h ▸ getVert_mem_support _ _)
 
-end HasAdj.Walk
+end HasDart.Walk

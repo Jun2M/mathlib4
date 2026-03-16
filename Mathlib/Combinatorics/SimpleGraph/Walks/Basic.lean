@@ -6,7 +6,7 @@ Authors: Kyle Miller, Peter Nelson
 module
 
 public import Mathlib.Combinatorics.SimpleGraph.Dart
-public import Mathlib.Combinatorics.HasAdj.Walks.Basic
+public import Mathlib.Combinatorics.HasDart.Walks.Basic
 
 /-!
 # Walks in simple graphs
@@ -16,7 +16,7 @@ This files gives simple-graph-specific properties of walks.
 
 @[expose] public section
 
-namespace HasAdj
+namespace HasDart
 
 universe u
 variable {V : Type u} (G : SimpleGraph V) {u v w : V}
@@ -29,7 +29,7 @@ variable {G}
 
 /-- The `edges` of a walk is the list of edges it visits in order.
 This is defined to be the list of edges underlying `SimpleGraph.Walk.darts`. -/
-def edges {u v : V} (p : Walk G u v) : List (Sym2 V) := p.darts.map Dart.edge
+def edges {u v : V} (p : Walk G u v) : List (Sym2 V) := p.darts.map prodDart.edge
 
 /-- Every edge in a walk's edge list is an edge of the graph.
 It is written in this form (rather than using `⊆`) to avoid unsightly coercions. -/
@@ -106,4 +106,4 @@ theorem mem_support_iff_exists_mem_edges_of_not_nil {u v w : V} {p : Walk G u v}
 
 end Walk
 
-end HasAdj
+end HasDart

@@ -58,7 +58,7 @@ open SimpleGraph
 variable {V : Type u} {V' : Type v}
 variable (G : SimpleGraph V) (G' : SimpleGraph V')
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 
 variable {G} {u u' v w : V}
 
@@ -235,7 +235,7 @@ theorem isPath_of_isSubwalk {v w v' w' : V} {p₁ : Walk G v w} {p₂ : Walk G v
   rw [h] at h₂
   exact h₂.of_append_left.of_append_right
 
-lemma IsPath.of_adj {G : SimpleGraph V} {u v : V} (h : G.Adj u v) : (Adj.toWalk h).IsPath := by
+lemma IsPath.of_adj {G : SimpleGraph V} {u v : V} (h : G.Adj u v) : (dart.toWalk h).IsPath := by
   aesop
 
 theorem concat_isPath_iff {p : Walk G u v} (h : G.Adj v w) :
@@ -286,7 +286,7 @@ lemma IsCycle.three_le_length {v : V} {p : Walk G v v} (hp : p.IsCycle) : 3 ≤ 
   have ⟨⟨hp, hp'⟩, _⟩ := hp
   match p with
   | .nil => simp at hp'
-  | .cons h .nil => simp [Adj] at h
+  | .cons h .nil => simp [dart] at h
   | .cons _ (.cons _ .nil) => simp at hp
   | .cons _ (.cons _ (.cons _ _)) => simp_rw [length_cons]; lia
 
@@ -592,25 +592,25 @@ lemma endpoint_notMem_support_takeUntil {p : Walk G u v} (hp : p.IsPath) (hw : w
 
 end WalkDecomp
 
-end HasAdj.Walk
+end HasDart.Walk
 
 namespace SimpleGraph
-open HasAdj
+open HasDart
 
 /-! ### Type of paths -/
 
 /-- The type for paths between two vertices. -/
-abbrev Path (u v : V) := { p : HasAdj.Walk G u v // p.IsPath }
+abbrev Path (u v : V) := { p : HasDart.Walk G u v // p.IsPath }
 
 namespace Path
 
 variable {G G'}
 
 @[simp]
-protected theorem isPath {u v : V} (p : G.Path u v) : (p : HasAdj.Walk G u v).IsPath := p.property
+protected theorem isPath {u v : V} (p : G.Path u v) : (p : HasDart.Walk G u v).IsPath := p.property
 
 @[simp]
-protected theorem isTrail {u v : V} (p : G.Path u v) : (p : HasAdj.Walk G u v).IsTrail :=
+protected theorem isTrail {u v : V} (p : G.Path u v) : (p : HasDart.Walk G u v).IsTrail :=
   p.property.isTrail
 
 /-- The length-0 path at a vertex. -/
@@ -624,7 +624,7 @@ def singleton {u v : V} (h : G.Adj u v) : G.Path u v :=
   ⟨Walk.cons h Walk.nil, by simp [h.ne]⟩
 
 theorem mk'_mem_edges_singleton {u v : V} (h : G.Adj u v) :
-    s(u, v) ∈ (singleton h : HasAdj.Walk G u v).edges := by simp [singleton]
+    s(u, v) ∈ (singleton h : HasDart.Walk G u v).edges := by simp [singleton]
 
 /-- The reverse of a path is another path.  See also `SimpleGraph.Walk.reverse`. -/
 @[symm, simps]
@@ -632,15 +632,15 @@ def reverse {u v : V} (p : G.Path u v) : G.Path v u :=
   ⟨Walk.reverse p, p.property.reverse⟩
 
 theorem count_support_eq_one [DecidableEq V] {u v w : V} {p : G.Path u v}
-    (hw : w ∈ (p : HasAdj.Walk G u v).support) : (p : HasAdj.Walk G u v).support.count w = 1 :=
+    (hw : w ∈ (p : HasDart.Walk G u v).support) : (p : HasDart.Walk G u v).support.count w = 1 :=
   List.count_eq_one_of_mem p.property.support_nodup hw
 
 theorem count_edges_eq_one [DecidableEq V] {u v : V} {p : G.Path u v} (e : Sym2 V)
-    (hw : e ∈ (p : HasAdj.Walk G u v).edges) : (p : HasAdj.Walk G u v).edges.count e = 1 :=
+    (hw : e ∈ (p : HasDart.Walk G u v).edges) : (p : HasDart.Walk G u v).edges.count e = 1 :=
   List.count_eq_one_of_mem p.property.isTrail.edges_nodup hw
 
 @[simp]
-theorem nodup_support {u v : V} (p : G.Path u v) : (p : HasAdj.Walk G u v).support.Nodup :=
+theorem nodup_support {u v : V} (p : G.Path u v) : (p : HasDart.Walk G u v).support.Nodup :=
   (Walk.isPath_def _).mp p.property
 
 theorem loop_eq {v : V} (p : G.Path v v) : p = Path.nil := by
@@ -649,10 +649,10 @@ theorem loop_eq {v : V} (p : G.Path v v) : p = Path.nil := by
   · simp at h
 
 theorem notMem_edges_of_loop {v : V} {e : Sym2 V} {p : G.Path v v} :
-    e ∉ (p : HasAdj.Walk G v v).edges := by simp [p.loop_eq]
+    e ∉ (p : HasDart.Walk G v v).edges := by simp [p.loop_eq]
 
 theorem cons_isCycle {u v : V} (p : G.Path v u) (h : G.Adj u v)
-    (he : s(u, v) ∉ (p : HasAdj.Walk G v u).edges) : (Walk.cons h ↑p).IsCycle := by
+    (he : s(u, v) ∉ (p : HasDart.Walk G v u).edges) : (Walk.cons h ↑p).IsCycle := by
   simp [Walk.isCycle_def, Walk.isTrail_cons, he]
 
 end Path
@@ -662,7 +662,7 @@ end SimpleGraph
 
 /-! ### Walks to paths -/
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 
 variable {G} [DecidableEq V] {u u' v v' : V}
 
@@ -939,4 +939,4 @@ theorem toDeleteEdges_copy {v u u' v' : V} (s : Set (Sym2 V))
 
 end Walk
 
-end HasAdj
+end HasDart

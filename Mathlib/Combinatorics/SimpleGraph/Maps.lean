@@ -42,7 +42,7 @@ abbreviations as well.
 
 
 open Function
-open HasAdj
+open HasDart
 
 namespace SimpleGraph
 
@@ -305,11 +305,11 @@ def mapNeighborSet (v : V) (w : G.neighborSet v) : G'.neighborSet (f v) :=
   ⟨f w, f.apply_mem_neighborSet w.property⟩
 
 /-- The map between darts induced by a homomorphism. -/
-def mapDart (d : Dart G) : Dart G' :=
+def mapDart (d : prodDart G) : prodDart G' :=
   ⟨d.1.map f f, f.map_adj d.2⟩
 
 @[simp]
-theorem mapDart_apply (d : Dart G) : f.mapDart d = ⟨d.1.map f f, f.map_adj d.2⟩ :=
+theorem mapDart_apply (d : prodDart G) : f.mapDart d = ⟨d.1.map f f, f.map_adj d.2⟩ :=
   rfl
 
 /-- The graph homomorphism from a smaller graph to a bigger one. -/

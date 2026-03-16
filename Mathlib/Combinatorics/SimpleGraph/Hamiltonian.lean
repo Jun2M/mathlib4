@@ -26,9 +26,9 @@ In this file we introduce Hamiltonian paths, cycles and graphs.
 open Finset Function
 
 variable {α β : Type*} [DecidableEq α] [DecidableEq β] {G : SimpleGraph α}
-  {a b : α} {p : HasAdj.Walk G a b}
+  {a b : α} {p : HasDart.Walk G a b}
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 
 /-- A Hamiltonian path is a walk `p` that visits every vertex exactly once. Note that while
 this definition doesn't contain that `p` is a path, `p.isPath` gives that. -/
@@ -173,10 +173,10 @@ lemma isHamiltonianCycle_iff_isCycle_and_length_eq [Fintype α] :
   refine isHamiltonian_iff_isPath_and_length_eq.mpr ⟨h₁.isPath_tail, ?_⟩
   grind [length_tail_add_one, IsCycle.not_nil]
 
-end HasAdj.Walk
+end HasDart.Walk
 
 namespace SimpleGraph
-open HasAdj
+open HasDart
 
 variable [Fintype α]
 
@@ -184,7 +184,7 @@ variable [Fintype α]
 
 By convention, the singleton graph is considered to be Hamiltonian. -/
 def IsHamiltonian (G : SimpleGraph α) : Prop :=
-  Fintype.card α ≠ 1 → ∃ a, ∃ p : HasAdj.Walk G a a, p.IsHamiltonianCycle
+  Fintype.card α ≠ 1 → ∃ a, ∃ p : HasDart.Walk G a a, p.IsHamiltonianCycle
 
 lemma IsHamiltonian.mono {H : SimpleGraph α} (hGH : G ≤ H) (hG : G.IsHamiltonian) :
     H.IsHamiltonian :=
@@ -247,7 +247,7 @@ theorem not_isHamiltonian_of_isBridge (G : SimpleGraph V)
   have he_not_in_cycle : s(x, y) ∉ c.edges :=
     (SimpleGraph.isBridge_iff_adj_and_forall_cycle_notMem.mp hbr).2 c hcHam.isCycle
   have hWalkAllMem :
-      ∀ p : HasAdj.Walk G x y, s(x, y) ∈ p.edges :=
+      ∀ p : HasDart.Walk G x y, s(x, y) ∈ p.edges :=
     (SimpleGraph.isBridge_iff_adj_and_forall_walk_mem_edges.mp hbr).2
   let cX := c.rotate (hcHam.mem_support x)
   have hcycleX : cX.IsCycle := hcHam.isCycle.rotate (hcHam.mem_support x)

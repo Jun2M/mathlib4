@@ -114,7 +114,7 @@ end Iso
 
 end SimpleGraph
 
-namespace HasAdj.Walk
+namespace HasDart.Walk
 
 variable {G : SimpleGraph α} (H : SimpleGraph β)
 
@@ -177,7 +177,7 @@ lemma length_boxProd {a₁ a₂ : α} {b₁ b₂ : β} [DecidableEq α] [Decidab
   | .cons x w' => next c =>
     unfold ofBoxProdLeft ofBoxProdRight
     rw [length_cons, length_boxProd w']
-    have disj : (G.Adj a₁ c.1 ∧ b₁ = c.2) ∨ (H.Adj b₁ c.2 ∧ a₁ = c.1) := by simp_all [Adj]
+    have disj : (G.Adj a₁ c.1 ∧ b₁ = c.2) ∨ (H.Adj b₁ c.2 ∧ a₁ = c.1) := by simp_all [dart]
     rcases disj with h₁ | h₂
     · simp only [h₁, and_self, ↓reduceDIte, length_cons, Or.by_cases]
       rw [add_comm, add_comm w'.ofBoxProdLeft.length 1, add_assoc]
@@ -185,7 +185,7 @@ lemma length_boxProd {a₁ a₂ : α} {b₁ b₂ : β} [DecidableEq α] [Decidab
     · simp only [h₂, add_assoc, Or.by_cases]
       congr <;> simp [h₂.2.symm]
 
-end HasAdj.Walk
+end HasDart.Walk
 
 namespace SimpleGraph
 
@@ -284,13 +284,13 @@ lemma edist_boxProd (x y : α × β) :
     have ⟨wH, hwH⟩ := exists_walk_of_edist_ne_top rGH.2
     let w_app := (wG.boxProdLeft _ _).append (wH.boxProdRight _ _)
     have w_len : w_app.length = wG.length + wH.length := by
-      unfold w_app HasAdj.Walk.boxProdLeft HasAdj.Walk.boxProdRight; simp
+      unfold w_app HasDart.Walk.boxProdLeft HasDart.Walk.boxProdRight; simp
     refine le_antisymm ?_ ?_
     · calc (G □ H).edist x y ≤ w_app.length := by exact edist_le _
           _ = wG.length + wH.length := by exact_mod_cast w_len
           _ = G.edist x.1 y.1 + H.edist x.2 y.2 := by simp only [hwG, hwH]
     · have ⟨w, hw⟩ := exists_walk_of_edist_ne_top h
-      rw [← hw, HasAdj.Walk.length_boxProd]
+      rw [← hw, HasDart.Walk.length_boxProd]
       exact add_le_add (edist_le w.ofBoxProdLeft) (edist_le w.ofBoxProdRight)
 
 end SimpleGraph

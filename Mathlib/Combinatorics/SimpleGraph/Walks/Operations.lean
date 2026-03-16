@@ -32,7 +32,7 @@ walks
 
 open Function
 
-namespace HasAdj
+namespace HasDart
 
 namespace Walk
 
@@ -160,7 +160,7 @@ theorem reverse_singleton {u v : V} (h : G.Adj u v) : (cons h nil).reverse = con
 
 @[simp]
 theorem reverse_toWalk {u v : V} (h : G.Adj u v) :
-    (HasAdj.Adj.toWalk h).reverse = HasAdj.Adj.toWalk h.symm := rfl
+    (HasDart.dart.toWalk h).reverse = HasDart.dart.toWalk h.symm := rfl
 
 @[simp]
 theorem cons_reverseAux {u v w x : V} (p : Walk G u v) (q : Walk G w x) (h : G.Adj w u) :
@@ -308,16 +308,16 @@ theorem concat_inj {u v v' w : V} {p : Walk G u v} {h : G.Adj v w} {p' : Walk G 
     · exact ⟨rfl, rfl⟩
     · simp only [concat_nil, concat_cons, cons.injEq] at he
       obtain ⟨rfl, he⟩ := he
-      exact (concat_ne_nil _ _ (heq_iff_eq.mp he).symm).elim
+      exact (concat_ne_nil _ _ (heq_iff_eq.mp he.2).symm).elim
   | cons _ _ ih =>
     rw [concat_cons] at he
     cases p'
     · simp only [concat_nil, cons.injEq] at he
       obtain ⟨rfl, he⟩ := he
-      exact (concat_ne_nil _ _ (heq_iff_eq.mp he)).elim
+      exact (concat_ne_nil _ _ (heq_iff_eq.mp he.2)).elim
     · rw [concat_cons, cons.injEq] at he
       obtain ⟨rfl, he⟩ := he
-      obtain ⟨rfl, rfl⟩ := ih (heq_iff_eq.mp he)
+      obtain ⟨rfl, rfl⟩ := ih (heq_iff_eq.mp he.2)
       exact ⟨rfl, rfl⟩
 
 @[simp]
@@ -355,9 +355,10 @@ theorem support_eq_concat {u v : V} (p : Walk G u v) : p.support = p.support.dro
     simp [hq]
 
 lemma ext_support {u v} {p q : Walk G u v} (h : p.support = q.support) : p = q := by
-  refine darts_injective (Dart.toProd_injective.list_map (List.rightInverse_unzip_zip.injective ?_))
-  have : Prod.fst ∘ Dart.toProd = fun d : Dart G ↦ d.fst := rfl
-  have : Prod.snd ∘ Dart.toProd = fun d : Dart G ↦ d.snd := rfl
+  refine darts_injective (prodDart.toProd_injective.list_map
+    (List.rightInverse_unzip_zip.injective ?_))
+  have : Prod.fst ∘ prodDart.toProd = fun d : prodDart G ↦ d.fst := rfl
+  have : Prod.snd ∘ prodDart.toProd = fun d : prodDart G ↦ d.snd := rfl
   grind [map_fst_darts, map_snd_darts]
 
 @[simp]
@@ -415,10 +416,10 @@ theorem darts_append {u v w : V} (p : Walk G u v) (p' : Walk G v w) :
 
 @[simp]
 theorem darts_reverse {u v : V} (p : Walk G u v) :
-    p.reverse.darts = (p.darts.map Dart.symm).reverse := by
+    p.reverse.darts = (p.darts.map prodDart.symm).reverse := by
   induction p <;> simp [*]
 
-theorem mem_darts_reverse {u v : V} {d : Dart G} {p : Walk G u v} :
+theorem mem_darts_reverse {u v : V} {d : prodDart G} {p : Walk G u v} :
     d ∈ p.reverse.darts ↔ d.symm ∈ p.darts := by simp
 
 @[simp]
@@ -439,7 +440,7 @@ theorem edges_append {u v w : V} (p : Walk G u v) (p' : Walk G v w) :
 theorem edges_reverse {u v : V} (p : Walk G u v) : p.reverse.edges = p.edges.reverse := by
   simp [edges]
 
-theorem dart_snd_mem_support_of_mem_darts {u v : V} (p : Walk G u v) {d : Dart G}
+theorem dart_snd_mem_support_of_mem_darts {u v : V} (p : Walk G u v) {d : prodDart G}
     (h : d ∈ p.darts) : d.snd ∈ p.support := by
   simpa using p.reverse.dart_fst_mem_support_of_mem_darts (by simp [h] : d.symm ∈ p.reverse.darts)
 
@@ -770,4 +771,4 @@ lemma ext_getVert {u v} {p q : Walk G u v} (h : ∀ k, p.getVert k = q.getVert k
 
 end Walk
 
-end HasAdj
+end HasDart

@@ -28,7 +28,7 @@ walks
 
 @[expose] public section
 
-namespace HasAdj
+namespace HasDart
 
 namespace Walk
 
@@ -126,7 +126,7 @@ theorem range_getVert_eq_range_support_getElem {u v : V} (p : Walk G u v) :
     fun ⟨n, _⟩ ↦ ⟨n, by grind [getVert_eq_support_getElem, length_support]⟩⟩
 
 theorem darts_getElem_eq_getVert {u v : V} {p : Walk G u v} (n : ℕ) (h : n < p.darts.length) :
-    p.darts[n] = ⟨⟨p.getVert n, p.getVert (n + 1)⟩, p.adj_getVert_succ (p.length_darts ▸ h)⟩ := by
+    p.darts[n] = ⟨(p.getVert n, p.getVert (n + 1)), p.adj_getVert_succ (p.length_darts ▸ h)⟩ := by
   rw [p.length_darts] at h
   ext <;> simp [p.getVert_eq_support_getElem (le_of_lt h), p.getVert_eq_support_getElem h]
 
@@ -197,14 +197,14 @@ lemma support_getElem_length_sub_one_eq_penultimate {p : Walk G u v} :
 
 /-- The first dart of a walk. -/
 @[simps]
-def firstDart (p : Walk G v w) (hp : ¬ p.Nil) : Dart G where
+def firstDart (p : Walk G v w) (hp : ¬ p.Nil) : prodDart G where
   fst := v
   snd := p.snd
   adj := p.adj_snd hp
 
 /-- The last dart of a walk. -/
 @[simps]
-def lastDart (p : Walk G v w) (hp : ¬ p.Nil) : Dart G where
+def lastDart (p : Walk G v w) (hp : ¬ p.Nil) : prodDart G where
   fst := p.penultimate
   snd := w
   adj := p.adj_penultimate hp
@@ -217,11 +217,11 @@ lemma edge_lastDart (p : Walk G v w) (hp : ¬ p.Nil) :
 
 theorem firstDart_eq {p : Walk G v w} (h₁ : ¬ p.Nil) (h₂ : 0 < p.darts.length) :
     p.firstDart h₁ = p.darts[0] := by
-  simp [Dart.ext_iff, firstDart_toProd, darts_getElem_eq_getVert]
+  simp [prodDart.ext_iff, firstDart_toProd, darts_getElem_eq_getVert]
 
 theorem lastDart_eq {p : Walk G v w} (h₁ : ¬ p.Nil) (h₂ : 0 < p.darts.length) :
     p.lastDart h₁ = p.darts[p.darts.length - 1] := by
-  simp (disch := grind) [Dart.ext_iff, lastDart_toProd, darts_getElem_eq_getVert,
+  simp (disch := grind) [prodDart.ext_iff, lastDart_toProd, darts_getElem_eq_getVert,
     p.getVert_of_length_le]
 
 /-- Use `firstDart_eq_head_darts` to rewrite in the reverse direction. -/
@@ -292,4 +292,4 @@ theorem mk_penultimate_end_mem_edges {p : Walk G v w} (hnil : ¬p.Nil) :
 
 end Walk
 
-end HasAdj
+end HasDart
