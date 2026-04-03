@@ -23,6 +23,8 @@ and the bottom element `⊥`.
 - `H ≤i G` (`Graph.IsInducedSubgraph`): `H` contains every ambient link between its vertices.
 - `H ≤c G` (`Graph.IsClosedSubgraph`): `H` is a union of components of `G`.
 - `⊥`: empty graph with no vertices or edges as its bottom element.
+- `G.StronglyDisjoint H`: `G` and `H` are strongly disjoint, i.e. their vertex sets and edge sets
+  are disjoint. This is a stronger notion than `Disjoint`.
 
 ## Implementation notes
 
@@ -410,5 +412,54 @@ lemma isClosedSubgraph_bot_iff : G ≤c ⊥ ↔ G = ⊥ :=
   ⟨fun h => le_bot_iff.mp h.le, fun h => h ▸ .rfl⟩
 
 end OrderBot
+
+section StronglyDisjoint
+
+/-- Two graphs are strongly disjoint if their edge sets and vertex sets are disjoint. This is a
+    stronger notion of disjointness than `Disjoint`, which is equivalent to `Disjoint V(G) V(H)`. -/
+@[mk_iff]
+structure StronglyDisjoint (G H : Graph α β) : Prop where
+  vertex : Disjoint V(G) V(H)
+  edge : Disjoint E(G) E(H)
+
+namespace StronglyDisjoint
+
+@[symm]
+lemma symm (h : G.StronglyDisjoint H) : H.StronglyDisjoint G :=
+  ⟨h.1.symm, h.2.symm⟩
+
+instance : Std.Symm (StronglyDisjoint : Graph α β → Graph α β → Prop) where
+  symm _ _ := StronglyDisjoint.symm
+
+lemma anti_left (h₁ : H₁ ≤ G) (h : G.StronglyDisjoint H) :
+    H₁.StronglyDisjoint H where
+  vertex := h.vertex.mono_left h₁.vertexSet_mono
+  edge := h.edge.mono_left h₁.edgeSet_mono
+
+lemma anti_right (h₂ : H₂ ≤ H) (h : G.StronglyDisjoint H) :
+    G.StronglyDisjoint H₂ where
+  vertex := h.vertex.mono_right h₂.vertexSet_mono
+  edge := h.edge.mono_right h₂.edgeSet_mono
+
+lemma anti (h₁ : H₁ ≤ G) (h₂ : H₂ ≤ H) (h : G.StronglyDisjoint H) :
+    H₁.StronglyDisjoint H₂ where
+  vertex := h.vertex.mono h₁.vertexSet_mono h₂.vertexSet_mono
+  edge := h.edge.mono h₁.edgeSet_mono h₂.edgeSet_mono
+
+lemma disjoint (h : G.StronglyDisjoint H) : Disjoint G H := by
+  rintro H' hH'G hH'H
+  rw [le_bot_iff, ← vertexSet_eq_empty_iff]
+  have := le_inf hH'G.vertexSet_mono <| hH'H.vertexSet_mono
+  rwa [h.vertex.eq_bot, le_bot_iff] at this
+
+end StronglyDisjoint
+
+lemma Compatible.StronglyDisjoint_iff (h₁ : H₁.Compatible H₂) :
+    StronglyDisjoint H₁ H₂ ↔ Disjoint V(H₁) V(H₂) := by
+  refine ⟨StronglyDisjoint.vertex, fun h ↦ ⟨h, disjoint_left.2 fun e he₁ he₂ ↦ ?_⟩⟩
+  obtain ⟨x, y, he₁⟩ := exists_isLink_of_mem_edgeSet he₁
+  exact h.notMem_of_mem_left he₁.left_mem (he₁.of_compatible h₁ he₂).left_mem
+
+end StronglyDisjoint
 
 end Graph
