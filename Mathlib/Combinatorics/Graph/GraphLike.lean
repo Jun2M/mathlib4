@@ -6,7 +6,7 @@ Authors: Jun Kwon
 module
 
 public import Mathlib.Combinatorics.GraphLike.Basic
-public import Mathlib.Combinatorics.Graph.Basic
+public import Mathlib.Combinatorics.Graph.Subgraph
 
 /-!
 In this file we make `Graph` an instance of `GraphLike`.
@@ -14,42 +14,62 @@ In this file we make `Graph` an instance of `GraphLike`.
 
 public section
 
-variable {α β γ : Type*} {G : Graph α β}
+variable {V E D : Type*} {G : Graph V E}
 
 namespace Graph
 
 /-- `HasDart` is a typeclass for graphs with a dart structure. -/
-class HasDart (G : Graph α β) (γ : outParam Type*) where
+class HasDart (G : Graph V E) (D : outParam Type*) [DartLike V D] where
   /-- The set of darts of a graph. -/
-  dartSet : Set γ
+  dartSet : Set D
   /-- The opposite dart, provided by fixed-point-free involution. -/
-  symm : γ → γ
+  symm : D → D
   symm_invol : ∀ ⦃d⦄, symm (symm d) = d
   symm_ne : ∀ ⦃d⦄, symm d ≠ d
+  symm_fst : ∀ ⦃d⦄, DartLike.fst (symm d) = (DartLike.snd d : V)
   symm_mem : ∀ ⦃d⦄, d ∈ dartSet → symm d ∈ dartSet
   /-- The edge of a dart. -/
-  edge : γ → β
+  edge : D → E
   edge_eq_edge_iff : ∀ ⦃d₁ d₂⦄, edge d₁ = edge d₂ ↔ d₁ = d₂ ∨ d₁ = symm d₂
   edge_surj : ∀ ⦃e⦄, e ∈ G.edgeSet → ∃ d ∈ dartSet, e = edge d
-  /-- The base point of a dart. -/
-  basePt : γ → α
-  isLink : ∀ ⦃d⦄, d ∈ dartSet → G.IsLink (edge d) (basePt d) (basePt (symm d))
+  isLink : ∀ ⦃d⦄, d ∈ dartSet → G.IsLink (edge d) (DartLike.fst d) (DartLike.snd d)
 
-instance [HasDart G γ] : GraphLike α γ G where
-  verts := V(G)
-  darts := HasDart.dartSet G
-  fst := HasDart.basePt G
-  snd := (HasDart.basePt G <| HasDart.symm G ·)
-  fst_mem_of_darts hd := (HasDart.isLink hd).left_mem
-  snd_mem_of_darts hd := (HasDart.isLink hd).right_mem
-  Adj u v := G.Adj u v
-  exists_darts_iff_adj {u v : α} := by
+open HasDart
+
+instance [DartLike V D] [HasDart G D] : GraphLike V D {H : Graph V E // H ≤ G} where
+  verts H := V(H.val)
+  darts H := (HasDart.edge G) ⁻¹' E(H.val)
+  fst_mem_of_darts H d hd := by
+    simp only [Set.mem_preimage] at hd
+    obtain ⟨d', hd', heq⟩ := edge_surj (H.prop.edgeSet_mono hd)
+    obtain rfl | rfl := edge_eq_edge_iff.mp heq
+    · exact isLink hd' |>.of_compatible (H.prop.compatible') hd |>.left_mem
+    rw [symm_fst]
+    exact heq ▸ isLink hd' |>.of_compatible (H.prop.compatible') hd |>.right_mem
+  snd_mem_of_darts H d hd := by
+    simp only [Set.mem_preimage] at hd
+    obtain ⟨d', hd', heq⟩ := edge_surj (H.prop.edgeSet_mono hd)
+    obtain rfl | rfl := edge_eq_edge_iff.mp heq
+    · exact isLink hd' |>.of_compatible (H.prop.compatible') hd |>.right_mem
+    rw [← symm_fst (G := G), symm_invol]
+    exact heq ▸ isLink hd' |>.of_compatible (H.prop.compatible') hd |>.left_mem
+  Adj H u v := H.val.Adj u v
+  exists_darts_iff_adj H u v := by
     refine ⟨?_, fun ⟨e, he⟩ => ?_⟩
     · rintro ⟨d, hd, rfl, rfl⟩
-      exact (HasDart.isLink hd).adj
-    obtain ⟨d, hd, rfl, rfl⟩ := HasDart.edge_surj he.edge_mem
-    obtain ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ := he.eq_and_eq_or_eq_and_eq <| HasDart.isLink hd
-    · use d, hd
-    exact ⟨HasDart.symm G d, HasDart.symm_mem hd, by simp [HasDart.symm_invol]⟩
+      rw [Set.mem_preimage] at hd
+      obtain ⟨d', hd', heq⟩ := edge_surj (H.prop.edgeSet_mono hd)
+      obtain rfl | rfl := edge_eq_edge_iff.mp heq
+      · exact isLink hd' |>.of_compatible (H.prop.compatible') hd |>.adj
+      rw [← symm_fst (G := G), symm_invol, symm_fst]
+      exact heq ▸ (heq ▸ isLink hd' |>.of_compatible (H.prop.compatible') hd) |>.adj.symm
+    obtain ⟨d, hd, rfl, rfl⟩ := edge_surj (he.mono H.prop).edge_mem
+    obtain ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ := (he.mono H.prop).eq_and_eq_or_eq_and_eq <| isLink hd
+    · use d, by simp [he.edge_mem]
+    refine ⟨symm G d, ?_, ?_⟩
+    · have := edge_eq_edge_iff.mpr (show symm G d = d ∨ symm G d = symm G d from by tauto)
+      simp [this, he.edge_mem]
+    simp only [symm_fst, true_and]
+    rw [← symm_fst (G := G), symm_invol]
 
 end Graph

@@ -12,22 +12,20 @@ public import Mathlib.Combinatorics.SimpleGraph.Basic
 In this file we make `SimpleGraph` an instance of `GraphLike`.
 -/
 
-public section
+@[expose] public section
 
-variable {V : Type*} {G : SimpleGraph V}
-
-open GraphLike
+variable {V : Type*}
 
 namespace SimpleGraph
 
-instance : SimpleGraphLike G where
-  verts := Set.univ
-  darts := { (u, v) | G.Adj u v }
-  fst_mem_of_darts _ := Set.mem_univ _
-  snd_mem_of_darts _ := Set.mem_univ _
-  Adj := G.Adj
-  exists_darts_iff_adj {u v : V} := by simp
+instance : GraphLike V (V × V) (SimpleGraph V) where
+  verts _ := Set.univ
+  darts G := { (u, v) | G.Adj u v }
+  fst_mem_of_darts _ _ _ := Set.mem_univ _
+  snd_mem_of_darts _ _ _ := Set.mem_univ _
+  Adj G := G.Adj
+  exists_darts_iff_adj {G : SimpleGraph V} {u v : V} := by simp
 
-lemma darts_def (G : SimpleGraph V) : D(G) = { (u, v) | G.Adj u v } := rfl
+lemma darts_def (G : SimpleGraph V) : GraphLike.darts G = { (u, v) | G.Adj u v } := rfl
 
 end SimpleGraph
